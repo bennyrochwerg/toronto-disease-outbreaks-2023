@@ -84,6 +84,9 @@ outbreak_data_2023 <-
   filter(name == "ob_report_2023") |>
   get_resource()
 
+# Saving the raw data as a CSV file
+write_csv(outbreak_data_2023, "raw_data.csv")
+
 # Renaming the two columns of interest
 outbreak_data_2023 <- outbreak_data_2023 |>
   rename(id = "_id",
@@ -102,6 +105,9 @@ outbreak_data_2023 <- outbreak_data_2023 |>
                                     "Hospital-Chronic Care" ~ "Hospital (Chronic Care)",
                                     "Hospital-Psychiatric" ~ "Hospital (Psychiatric)",
                                     "Transitional Care" ~ "Transitional Care"))
+
+# Saving the final cleaned data as a CSV file
+write_csv(outbreak_data_2023, "final_cleaned_data.csv")
 ```
 
 # Results
