@@ -6,7 +6,7 @@ format: pdf
 
 # GitHub Repository Link
 
-<>
+<https://github.com/bennyrochwerg/toronto-disease-outbreaks-2023.git>
 
 This GitHub Repository includes the R code and Figures involved in creating this report.
 
