@@ -1,0 +1,164 @@
+---
+title: "Assessing 2023 Disease Outbreaks by Location Type in Toronto"
+author: "Benny Rochwerg"
+format: pdf
+---
+
+# GitHub Repository Link
+
+<>
+
+This GitHub Repository includes the R code and Figures involved in creating this report.
+
+# Dataset Sketch
+
+A sketch of the required dataset (Figure 1) is available on the GitHub Repository and is labelled as `Figure 1.JPG`.
+
+# Graph Sketch
+
+A sketch of the graph to be developed in this analysis (Figure 2) is available on the GitHub Repository and is labelled as `Figure 2.JPG`.
+
+# Preamble Documentation
+
+```{r}
+#### Preamble ####
+
+# Purpose: Employ data pertaining to 2023 disease outbreaks in Toronto
+# in order to create a graph of the number of outbreaks in each type
+# of location.
+# Author: Benny Rochwerg
+# Email: benny.rochwerg@mail.utoronto.ca
+# Date: January 16, 2024
+# Prerequisites: Ability to acquire data regarding 2023 disease outbreaks
+# in Toronto.
+```
+
+```{r}
+#| echo: false
+#### Loading Packages ####
+
+# install.packages("opendatatoronto")
+# install.packages("janitor")
+# install.packages("tidyverse")
+# install.packages("knitr")
+```
+
+```{r}
+#| echo: false
+#| warning: false
+library(opendatatoronto)
+library(janitor)
+library(tidyverse)
+library(knitr)
+```
+
+# Data Simulation
+
+```{r}
+#| echo: false
+#### Data Simulation ####
+
+set.seed(304)
+
+outbreak_simulated_data <-
+  tibble("ID" = 1:100,
+         "Location Type" = sample(
+           x = c("School", "Hospital", "Long-Term Care Home", "Other"),
+           size = 100,
+           replace = TRUE)
+         )
+
+# The following code was learned in STA304H1.
+head(outbreak_simulated_data) |>
+  kable(caption = "Simulated 2023 Toronto Outbreak Data")
+```
+
+```{r}
+#| echo: false
+#### Downloading and Cleaning Dataset ####
+
+# Downloading the dataset
+outbreak_data_2023 <-
+  search_packages("Outbreaks in Toronto Healthcare Institutions") |>
+  list_package_resources() |>
+  filter(name == "ob_report_2023") |>
+  get_resource()
+
+# Renaming the two columns of interest
+outbreak_data_2023 <- outbreak_data_2023 |>
+  rename(id = "_id",
+         location_type = "Outbreak Setting")
+
+# Isolating the two columns of interest
+outbreak_data_2023 <- outbreak_data_2023 |>
+  select(id, location_type)
+
+# Renaming the location types for clarity
+outbreak_data_2023 <- outbreak_data_2023 |>
+  mutate(location_type = case_match(location_type,
+                                    "LTCH" ~ "Long-Term Care Home",
+                                    "Hospital-Acute Care" ~ "Hospital (Acute Care)",
+                                    "Retirement Home" ~ "Retirement Home",
+                                    "Hospital-Chronic Care" ~ "Hospital (Chronic Care)",
+                                    "Hospital-Psychiatric" ~ "Hospital (Psychiatric)",
+                                    "Transitional Care" ~ "Transitional Care"))
+```
+
+# Results
+
+```{r}
+#| echo: false
+#### Generating a Table and a Graph ####
+
+# Collecting the number of outbreaks for each location type
+# The following code was learned in STA304H1.
+outbreak_data_2023 |>
+  count(location_type) |>
+  rename(`Location type` = location_type,
+         `Number of outbreaks in 2023` = n) |>
+  kable(caption = "Number of Outbreaks by Location Type in Toronto from 2023")
+
+# Generating a bar graph to illustrate the number of outbreaks for each location type
+outbreak_data_2023 |>
+  ggplot(aes(x = location_type)) +
+  geom_bar() +
+  theme_bw() +
+  labs(x = "Location type", y = "Number of outbreaks in 2023") +
+  ggtitle("Figure 3: 2023 Toronto Outbreak Data") +
+  coord_flip() # The coord_flip function was covered in STA304H1.
+  # The ggtitle function was obtained from the Help section in the Workspace
+```
+
+# Discussion
+
+Toronto Public Health maintains data on health care facilities' disease outbreaks (Toronto Public Health 2024). These outbreaks are characterized as a greater-than-anticipated rise in disease at a particular location (Toronto Public Health 2024). The purpose of this investigation was to assess the number of outbreaks by location type in Toronto from 2023.
+
+To do this, outbreak data was collected from Toronto Public Health through the `opendatatoronto` package (Gelfand 2022) for the R programming language (R Core Team 2023). This data was then cleaned with the R programming language (R Core Team 2023) as well as the `janitor` (Firke 2023), `tidyverse` (Wickham et al. 2019), and `knitr` (Xie 2023) packages.
+
+Table 2 and Figure 3 illustrate the number of outbreaks by location type in Toronto from 2023. Long-term care homes had 602 outbreaks, followed by retirement homes (195 outbreaks), hospitals with respect to chronic care (131 outbreaks), hospitals with respect to acute care (107 outbreaks), hospitals with respect to psychiatric care (19 outbreaks), and transitional care facilities (13 outbreaks).
+
+These results show that long-term care homes had substantially more outbreaks than other health care facilities in Toronto in 2023. The vast majority of Ontario long-term care home residents are 65 years of age or older (Ontario Centres for Learning, Research and Innovation in Long-Term Care 2018). Also, older individuals are more susceptible to becoming ill due to a poorer immune system (Brodkey 2022). Consequently, it appears that enhanced infection control protocols should be enacted in long-term care homes to reduce the number of outbreaks in these vulnerable settings. Future research should examine the impacts of different infection control techniques in long-term care homes to help alleviate this issue.
+
+# Acknowledgements
+
+This document was adapted from Rohan Alexander's *Telling Stories with Data* (Alexander 2023).
+
+# References
+
+Alexander, Rohan. 2023. *Telling Stories with Data*. 1st ed. Boca Raton: CRC Press. <https://tellingstorieswithdata.com/>.
+
+Brodkey, Frank D. 2022. "Aging changes in immunity." *MedlinePlus*, July. <https://medlineplus.gov/ency/article/004008.htm>.
+
+Firke, Sam. 2023. *janitor: Simple Tools for Examining and Cleaning Dirty Data.* <https://CRAN.R-project.org/package=janitor>.
+
+Gelfand, Sharla. 2022. *opendatatoronto: Access the City of Toronto Open Data Portal*. <https://cran.r-project.org/package=opendatatoronto>.
+
+Ontario Centres for Learning, Research and Innovation in Long-Term Care. 2018. "A Home for All: Younger Residents Living in Long-Term Care." November. <https://clri-ltc.ca/files/2019/01/Younger-Residents-in-LTC-Handout.pdf>.
+
+R Core Team. 2023. *R: A Language and Environment for Statistical Computing.* Vienna, Austria: R Foundation for Statistical Computing. <https://www.R-project.org/>.
+
+Toronto Public Health. 2024. "Outbreaks in Toronto Healthcare Institutions." *City of Toronto*, January. <https://open.toronto.ca/dataset/outbreaks-in-toronto-healthcare-institutions/>.
+
+Wickham, Hadley, Mara Averick, Jenny Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the Tidyverse.” *Journal of Open Source Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
+
+Xie, Yihui. 2023. *knitr: A General-Purpose Package for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
